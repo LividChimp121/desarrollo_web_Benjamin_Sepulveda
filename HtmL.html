@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panoramas en Santiago</title>
+    <!-- Estilo básico -->
+    <style>
+        .mi-tabla {
+            border: 1px solid black; 
+            border-spacing: 0; 
+            width: 100%; 
+        }
+
+        .mi-tabla th, .mi-tabla td {
+            border: 1px solid black; 
+            padding: 18px; 
+            text-align: center; 
+        }
+
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        header {
+            background-color: hsl(120, 98%, 25%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            height: 300px; /* Ajusta la altura del encabezado */
+            overflow: hidden;
+            z-index: 1;
+        }
+        header img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Asegura que la imagen se ajuste sin deformarse */
+            z-index: -1;
+        }
+        .header-buttons {
+            display: flex;
+            justify-content: flex-end; /* Alinea los botones a la derecha */
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .header-buttons button {
+            background-color: #f2f2f2;
+            color: #333;
+            padding: 10px 15px;
+            border: none;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .header-buttons button{
+            background-color: #ddd;
+        }
+        main {
+            padding: 20px;
+        }
+        #activities {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+        }
+        .imagen_mini{
+            width:320px;
+            height:240px;
+            cursor:pointer
+        }
+        /* Ventana emergente */
+        #ventana {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            text-align: center;
+        }
+
+        /* Imagen grande */
+        #imagen-grande {
+            width: 800px;
+            height: 600px;
+            margin-top: 50px;
+        }
+
+        /* Botón de cerrar */
+        #cerrar, #cerrar-form {
+            background: rgb(12, 199, 237);
+            color: white;
+            padding: 10px;
+            cursor: pointer;
+        }
+        .formulario {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 100px;
+            text-align: left;
+        }
+        #form-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -65%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 1000;
+            width: 90%; /* Asegura que el formulario no sea demasiado ancho en pantallas pequeñas */
+            max-width: 600px; /* Define un máximo para que no sea demasiado grande */
+            max-height: 80vh; /* Limita la altura al 80% de la pantalla */
+            overflow-y: auto; /* Agrega desplazamiento vertical si el contenido es largo */
+        }
+
+        /* Detalles de actividad */
+        #detalle-actividad {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        #detalle-actividad table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #detalle-actividad th,
+        #detalle-actividad td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        #detalle-actividad th {
+            background-color: #f2f2f2;
+        }
+        
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Buscando Panoramas?</h1>
+        <div class="header-buttons">
+            <button onclick="mostrarFormulario()">Agregar actividades</button>
+            <button onclick="document.getElementById('activities').scrollIntoView({behavior :'smooth'})">Ver listado de actividades</button>
+            <button onclick="window.location.href='Graficos.html';">Ver Estadísticas</button>
+        </div>
+        <img src="Banner-Atracciones.webp" alt="Imagen de encabezado">
+    </header>
+    
+    <main>
+        <p>Esta página web busca acercar comunidades a actividades planificadas y panoramas donde cualquiera puede atreverse a publicar para formar comunidad.</p>
+
+        <!-- Imagen en el cuerpo -->
+        <img src="oso.jpg" alt="Imagen cuerpo">
+        <h2 id="activities">Ultimas actividades agregadas!</h2>
+        <table class="mi-tabla">
+            <thead>
+                <tr>
+                    <th>Inicio</th>
+                    <th>Término</th>
+                    <th>Comuna</th>
+                    <th>Sector</th>
+                    <th>Tema</th>
+                    <th>Fotos</th>
+                    <th>Detalles</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr onclick="mostrarDetalles('actividad1')">
+                    <td>2025-03-28<br>
+                        12:00</td>
+                    <td>2025-03-28<br>
+                        14:00</td>
+                    <td>santiago</td>
+                    <td>Beauchef
+                        850 <br>
+                        terraza</td>
+                    <td>Catapultazo Beuchef</td>
+                    <td><img src="Catapultaso.jpg" class="imagen_mini" onclick="mostrarImagen('Catapultaso.jpg')" alt="Imagen de una catapulta cargada"></td>
+
+                    <td><button>Ver detalles</button></td>
+                 </tr>
+                 <tr onclick="mostrarDetalles('actividad2')">
+                    <td>2025-03-21<br>
+                        12:00</td>
+                    <td>2025-04-20<br>
+                        18:00</td>
+                    <td>Ñuñoa</td>
+                    <td>Estadio nacional<br></td>
+                    <td>Competencia MrBestia</td>
+                    <td><img src="Competencia-mr-beast.avif" class="imagen_mini" onclick="mostrarImagen('Competencia-mr-beast.avif')" alt="Imagen de la competencia mrbeast"></td>
+                    <td><button onclick="mostrarDetalles('competencia')">Ver detalles</button></td>
+                </tr>
+                <tr onclick="mostrarDetalles('actividad3')">
+                    <td>2026-06-23<br>
+                        12:00</td>
+                    <td>2026-06-29<br>
+                        03:00</td>
+                    <td>santiago</td>
+                    <td>Beauchef
+                        851 <br>
+                        La Kinder</td>
+                    <td>Maraton Intro Algebra</td>
+                    <td><img src="Estudiando-intro-al-algebra.jpg" class="imagen_mini" onclick="mostrarImagen('Estudiando-intro-al-algebra.jpg')" alt="Imagen de un chico estudiando"></td>
+                    <td><button onclick="mostrarDetalles('estudiando')">Ver detalles</button></td>
+                </tr>
+                <tr onclick="mostrarDetalles('actividad4')">
+                    <td>2027-01-24<br>
+                        13:00</td>
+                    <td>2027-01-24<br>
+                        17:00</td>
+                    <td>Providencia</td>
+                    <td>Costanera
+                    <td>Competencia de comer tortas</td>
+                    <td><img src="Torta-Bruce.jpg" class="imagen_mini" onclick="mostrarImagen('Torta-Bruce.jpg')" alt="Imagen del Bruce de la pelicula de Matilde"></td>
+                    <td><button onclick="mostrarDetalles('Torta')">Ver detalles</button></td>
+                </tr>
+                <tr onclick="mostrarDetalles('actividad5')">
+                    <td>2025-03-28<br>
+                        10:50</td>
+                    <td>2025-06-28<br>
+                        23:00</td>
+                    <td>santiago</td>
+                    <td>Beauchef
+                        850 <br>
+                        SalaCec</td>
+                    <td>"Aprender" a hacer pag web</td>
+                    <td><img src="Me-eche-paginas-web.jpg" class="imagen_mini" onclick="mostrarImagen('Me-eche-paginas-web.jpg')" alt="Meme acerca de la crear pag web"></td>
+                    <td><button onclick="mostrarDetalles('Web')">Ver detalles</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+     <!-- Detalle de actividad -->
+     <div id="detalle-actividad" style="display: none;">
+        <h3>Detalles de la actividad</h3>
+        <table>
+            <tr>
+                <th>Región:</th>
+                <td id="detalle-region"></td>
+            </tr>
+            <tr>
+                <th>Comuna:</th>
+                <td id="detalle-comuna"></td>
+            </tr>
+            <tr>
+                <th>Sector:</th>
+                <td id="detalle-sector"></td>
+            </tr>
+            <tr>
+                <th>Nombre del organizador:</th>
+                <td id="detalle-nombre"></td>
+            </tr>
+            <tr>
+                <th>Email:</th>
+                <td id="detalle-email"></td>
+            </tr>
+            <tr>
+                <th>Teléfono:</th>
+                <td id="detalle-telefono"></td>
+            </tr>
+            <tr>
+                <th>Contactar por:</th>
+                <td id="detalle-contacto"></td>
+            </tr>
+            <tr>
+                <th>Fecha y Hora de inicio:</th>
+                <td id="detalle-inicio"></td>
+            </tr>
+            <tr>
+                <th>Fecha y Hora de término:</th>
+                <td id="detalle-termino"></td>
+            </tr>
+            <tr>
+                <th>Descripción:</th>
+                <td id="detalle-descripcion"></td>
+            </tr>
+            <tr>
+                <th>Tema:</th>
+                <td id="detalle-tema"></td>
+            </tr>
+            <tr>
+                <th>Fotos:</th>
+                <td id="detalle-fotos"></td>
+            </tr>
+        </table>
+        <br>
+        <button onclick="volverListado()">Volver al listado de actividades</button>
+        <button onclick="volverAPortada()">Volver a la portada</button>
+    </div>
+
+    <div id="ventana">
+        <img id="imagen-grande" src="pixel.png" alt="Imagen grande">
+        <br>
+        <button id="cerrar" onclick="cerrarimagen()">Cerrar</button>
+    </div>
+
+    <div id="form-popup">
+        <div class="formulario">
+            <h2>Informar Actividad!</h2>
+            <form id="formulario-actividad">
+                <h3>¿Dónde?:</h3>
+                <label for="region">selecciona la Región:</label>
+                <select id="region" name="region" onchange="actualizarComunas()" required>
+                    <option value="">Selecciona una región</option>
+                    <option value="valparaiso">Región de Valparaíso</option>
+                    <option value="metropolitana">Región Metropolitana de Santiago</option>
+                    <option value="ohiggins">Región del Libertador General Bernardo O'Higgins</option>
+                    <option value="maule">Región del Maule</option>
+                    <option value="ñuble">Región de Ñuble</option>
+                    <option value="biobio">Región del Biobío</option>
+                    <option value="araucania">Región de La Araucanía</option>
+                </select>
+                <br><br>
+
+                <label for="comuna">selecciona la comuna:</label>
+                <select id="comuna" name="comuna" required>
+                    <option value="">Selecciona una comuna</option>
+                </select>
+                <br><br>
+
+            <label for="sector">Sector:</label><br>
+            <textarea id="sector" name="sector" placeholder="Ejemplo: Plaza parque O'higgins"></textarea>
+            <br><br>
+            <h3>¿Quién organiza?</h3><br>
+                <label for="nombre">Nombre:<br></label>
+                <input type="text" id="nombre" name="nombre" required>
+                <br><br>
+                <label for="email">email:<br></label>
+                <input type="email" id="email" name="email" required>
+                <br><br>
+                <label for="tel">Número de telefono:<br></label>
+                <input type="tel" id="tel" name="tel" required>
+                <br><br>
+                <label for="tema">Contactar por:<br></label>
+                <select id="tema" name="tema" required onchange="mostrarCampos()">
+                    <option value="">Selecciona un tema</option>
+                    <option value="whatsapp">Whatsapp</option>
+                    <option value="telegram">Telegram</option>
+                    <option value="x">X</option>
+                    <option value="instagram">Instagram</option>
+                    <option value="tiktok">Tiktok</option>
+                    <option value="otro">Otro</option>
+                </select>
+
+                <div id="otro-tema-div" style="display: none;">
+                    <label for="otro-tema">Especificar red social:</label>
+                    <input type="text" id="otro-tema" name="otro-tema" placeholder="Especifica cuál es la red social" > 
+                    <br><br>
+                </div>
+                <div id="id-red-social-div" style="display: none;">
+                    <label for="id-red-social">ID de la red social o URL:</label>
+                    <input type="text" id="id-red-social" name="id-red-social" placeholder="Especifica el ID o URL del contacto" minlength="3" maxlength="15" >
+                    <br><br>
+                </div>
+
+
+                <br><br>
+                <h3>¿Cuándo y de qué trata?:</h3>
+                <label for="inicio">Día y hora de inicio:</label><br>
+                <input type="datetime-local" id="inicio" name="inicio" required>
+                <br><br>
+                
+                <label for="termino">Día y hora de término:</label><br>
+                <input type="datetime-local" id="termino" name="termino">
+                <br><br>
+                <label for="descripcion">Descripción:</label><br>
+                <textarea id="descripcion" name="descripcion" cols="50" rows="5"></textarea>
+                <br><br>
+
+                <label for="topic">Tema:</label>
+                <select id="topic" name="topic" required onchange="mostrarTema()">
+                    <option value="">Selecciona un tema</option>
+                    <option value="musica">Música</option>
+                    <option value="deporte">Deporte</option>
+                    <option value="ciencias">Ciencias</option>
+                    <option value="religion">Religión</option>
+                    <option value="politica">Política</option>
+                    <option value="tecnologia">Tecnología</option>
+                    <option value="juegos">Juegos</option>
+                    <option value="baile">Baile</option>
+                    <option value="comida">Comida</option>
+                    <option value="otro">Otro</option>
+                </select>
+                <br><br>
+                <div id="otro-topic" style="display: none;">
+                    <label for="otro-top">Especificar tema:</label>
+                    <input type="text" id="otro-top" name="otro-top" placeholder ="Especifica aquí el tema" minlength="3" maxlength="15">
+                    <br><br>
+                </div>
+                
+                <label for="fotos">Subir fotos (mínimo 1, máximo 5):</label>
+                <div id="foto-container">
+                    <input type="file" id="fotos" name="fotos" accept="image/*" required>
+                </div>
+                <button type="button" id="agregar-foto">Agregar otra foto</button>
+                <br><br>
+
+                <br><br>
+                <!-- Aquí van los elementos para la validación -->
+                <div id="val-box" style="display:none;">
+                    <ul id="val-list"></ul>
+                    <p id="val-msg"></p>
+                </div>
+
+                <button type="button" onclick="cerrarFormulario()">Cancelar</button>
+                <button type="submit">Agregar esta actividad</button>
+
+            </form>
+        </div>
+    </div>
+
+    
+<script>
+    // Pondré las comunas por región:
+    const ComunasPorRegion = {
+        "valparaiso": ["Valparaíso", "Viña del Mar", "San Antonio"],
+        "metropolitana": ["Santiago", "Ñuñoa", "Providencia", "Las Condes", "Maipú", "Puente Alto", "La Florida"],
+        "ohiggins": ["Rancagua", "San Fernando", "Rengo", "Santa Cruz"],
+        "maule": ["Talca", "Curicó", "Linares", "Constitución"],
+        "ñuble": ["Chillán", "San Carlos"],
+        "biobio": ["Concepción", "San Pedro de la Paz", "Los Ángeles"],
+        "araucania": ["Temuco", "Villarrica", "Pucón"]
+    };
+    function actualizarComunas() {
+        const region = document.getElementById("region").value;
+        const comunaSelect = document.getElementById("comuna");
+
+        //No queremos que hayan opciones de comunas todavia
+        comunaSelect.innerHTML = "<option value=''>Selecciona una comuna</option>";
+
+        if (region && ComunasPorRegion[region]) {
+            let comunas = ComunasPorRegion[region]; //listado de comunas
+            comunas.forEach(function(comuna) {
+                const option = document.createElement("option");
+                 option.value = comuna;
+                 option.textContent = comuna;
+                 comunaSelect.appendChild(option);
+            });
+        }
+    }
+
+    // Funciones de validación
+    const validateSelect = (select) => {
+        if (!select) return false
+        return select && select !== "";
+    }
+
+    const validateText = (text, numero) =>{
+        let lengthValid = text.length <= numero;
+        return lengthValid
+    };
+    const validateEmail = (email) => {
+    if (!email) return false;
+    let lengthValid = email.length <100;
+    let re = /^[a-zA-Z0-9._%+-]{4,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    let formatValid = re.test(email);
+        return lengthValid && formatValid;
+    };
+    const validatePhoneNumber = (phoneNumber) => {
+    if (!phoneNumber) return false;
+    let lengthValid = phoneNumber.length >= 8;
+    let re = /^\+569\d{8}$/;
+    let formatValid = re.test(phoneNumber);
+    return lengthValid && formatValid;
+    };
+
+    const validateForm = () => {
+        let myForm = document.forms["formulario-actividad"];
+        let region = myForm["region"].value;
+        let comuna = myForm["comuna"].value;
+        let sector = myForm["sector"].value.trim();
+        let name = myForm["nombre"].value;
+        let email = myForm["email"].value;
+        let phoneNumber = myForm["tel"].value;
+        let RS = myForm["tema"].value;
+        let inicio = myForm["inicio"].value;
+        let termino = myForm["termino"].value;
+        let tema = myForm["topic"].value;
+        let otroTema= myForm["otro-top"].value
+
+        let invalidInputs = [];
+        let isValid = true;
+        const setInvalidInput = (inputName) => {
+            invalidInputs.push(inputName);
+            isValid = false;
+        };
+        if (!validateSelect(region)) {
+            setInvalidInput("Región");
+        }
+        if (!validateSelect(comuna)) {
+            setInvalidInput("Comuna");
+        }
+        if (sector.length > 0 && !validateText(sector, 100)) {
+        setInvalidInput("Sector (máximo 100 caracteres)");
+        }
+        if (name.length < 3 || /\d/.test(name) || /\s/.test(name) || !validateText(name, 200)) {
+            setInvalidInput("Nombre (máximo 200 caracteres, sin espacio ni numeros)");
+        }
+        if (!validateEmail(email)) {
+        setInvalidInput("Email (De la forma jorge@dim.cl)");
+        }
+        if (!validatePhoneNumber(phoneNumber)) {
+        setInvalidInput("Número de teléfono(+56912345678)");
+        }
+        if (inicio === "") {
+        setInvalidInput("Fecha de inicio");
+        }
+        if (termino === "" || inicio > termino) {
+            setInvalidInput("Fecha final menor a la inicial!")
+        }
+        if (!validateSelect(tema)) {
+            setInvalidInput("Debes elegir un tema")
+        }
+        if (tema === "otro" && otroTema.trim() === "") {
+            setInvalidInput("Debes especificar que tema")
+        }
+        const fileInputs = document.querySelectorAll('input[type="file"][name="fotos"]');
+        const cantidadInputs = fileInputs.length;
+
+        if (cantidadInputs < 1 || cantidadInputs > 5) {
+            setInvalidInput("Debes tener entre 1 y 5 campos de fotos.");
+        }
+
+        for (let input of fileInputs) {
+            if (!input.files || input.files.length !== 1) {
+                setInvalidInput("Cada campo de foto debe tener un archivo seleccionado.");
+            }
+        }
+
+
+
+        // finalmente mostrar la validación
+        let validationBox = document.getElementById("val-box");
+        let validationMessageElem = document.getElementById("val-msg");
+        let validationListElem = document.getElementById("val-list");
+
+        validationListElem.innerHTML = "";
+        validationMessageElem.textContent = "";
+
+        if (!isValid) {
+        validationBox.style.display = "block";
+        validationListElem.innerHTML = invalidInputs.map(item => `<li>${item}</li>`).join('');
+        validationMessageElem.textContent = "Faltan campos obligatorios o inválidos.";
+        return false;
+    }
+
+        validationBox.style.display = "none";  // Ocultar el mensaje de validación si todo es válido
+        return true;
+};
+    //Funcion de file Fotos
+    document.addEventListener("DOMContentLoaded", function () {
+        const fotoContainer = document.getElementById("foto-container");
+        const agregarFotoBtn = document.getElementById("agregar-foto");
+        let fotoCount = 1;
+
+        agregarFotoBtn.addEventListener("click", function () {
+            if (fotoCount < 5) {
+                const nuevoInput = document.createElement("input");
+                nuevoInput.type = "file";
+                nuevoInput.name = "fotos";
+                nuevoInput.accept = "image/*";
+                nuevoInput.classList.add("foto-input"); 
+                fotoContainer.appendChild(nuevoInput);
+                fotoCount++;
+            }
+            if (fotoCount >= 5) {
+                agregarFotoBtn.disabled = true;
+            }
+        });
+    });
+
+    // Función de confirmación
+    function mostrarConfirmacion() {
+        const confirmacion = confirm("¿Está seguro que desea agregar esta actividad?");
+        if (confirmacion) {
+            document.getElementById("form-popup").innerHTML = `
+                <div class="formulario">
+                    <h2>Hemos recibido su información. ¡Muchas gracias y suerte en su actividad!</h2>
+                    <button onclick="volverAPortada()">Volver a la portada</button>
+                </div>
+            `;
+        }
+    }
+    //Obteniendo la hora :C
+    const inicioInput = document.getElementById("inicio");
+    const terminoInput = document.getElementById("termino");
+
+    const now = new Date();
+    const año = now.getFullYear();
+    const mes = (now.getMonth() + 1).toString().padStart(2, '0');
+    const dia = now.getDate().toString().padStart(2, '0');
+    const horas = now.getHours().toString().padStart(2, '0');
+    const minutos = now.getMinutes().toString().padStart(2, '0');
+
+    inicioInput.value = año + "-" + mes + "-" + dia + "T" + horas + ":" + minutos;
+
+    // Sumar 3 horas
+    const later = new Date(now.getTime() + 3 * 60 * 60 * 1000);
+    const horasLater = later.getHours().toString().padStart(2, '0');
+    const minutosLater = later.getMinutes().toString().padStart(2, '0');
+
+    terminoInput.value = año + "-" + mes + "-" + dia + "T" + horasLater + ":" + minutosLater;
+
+
+    // Evento de envío del formulario
+    document.getElementById('formulario-actividad').addEventListener('submit', function(event) {
+        event.preventDefault(); // Detener el envío inicial
+
+        if (validateForm() && mostrarConfirmacion()) {
+            this.submit(); // Enviar el formulario solo si el usuario confirma
+        }
+    });
+
+
+    function volverAPortada() {
+        document.getElementById("form-popup").style.display = "none";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+    function mostrarFormulario() {
+            let formPopup = document.getElementById("form-popup");
+            formPopup.style.display = "block"; 
+            formPopup.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        function cerrarFormulario() {
+            document.getElementById("form-popup").style.display = "none";
+        }
+    //Agrandar la imagen!
+    function mostrarImagen(imagen) {
+        document.getElementById("imagen-grande").src = imagen;
+        document.getElementById("ventana").style.display = "block";
+    }
+    function cerrarimagen() {
+        document.getElementById("ventana").style.display = "none";
+    }
+    function mostrarCampos() {
+        let temaSelect = document.getElementById("tema");
+        let otroTemaDiv = document.getElementById("otro-tema-div");
+        let idRedSocialDiv = document.getElementById("id-red-social-div");
+
+        // Si se selecciona "Otro", muestra el campo para especificar cuál red social
+        if (temaSelect.value === "otro") {
+            otroTemaDiv.style.display = "block";  // Muestra el campo para especificar la red social
+        } else {
+            otroTemaDiv.style.display = "none";   // Oculta el campo para especificar la red social
+        }
+
+        // Siempre muestra el campo de ID o URL de la red social si se selecciona cualquier opción
+        if (temaSelect.value) {
+            idRedSocialDiv.style.display = "block";  // Muestra el campo para el ID o URL
+        } else {
+            idRedSocialDiv.style.display = "none";   // Oculta el campo de ID o URL si no se selecciona nada
+        }
+    }
+
+// Función para mostrar los detalles de una actividad
+    function mostrarDetalles(actividad) {
+        var detalles = {
+            actividad1: {
+                region: "Santiago",
+                comuna: "Santiago",
+                sector: "Beauchef 850",
+                nombre: "Carlos M.",
+                email: "carlosm@example.com",
+                telefono: "+56 9 1234 5678",
+                contacto: "email",
+                inicio: "2025-03-28 12:00",
+                termino: "2025-03-28 14:00",
+                descripcion: "Catapultazo Beuchef",
+                tema: "Deportes",
+                fotos: `<td><img src="Catapultaso.jpg" class="imagen_mini" onclick="mostrarImagen('Catapultaso.jpg')" alt="Imagen de una catapulta en acción"'>`
+            },
+            actividad2: {
+                region: "Ñuñoa",
+                comuna: "Ñuñoa",
+                sector: "Estadio nacional",
+                nombre: "Andrea P.",
+                email: "andrea@example.com",
+                telefono: "+56 9 9876 5432",
+                contacto: "email",
+                inicio: "2025-03-21 12:00",
+                termino: "2025-04-20 18:00",
+                descripcion: "Competencia MrBeast",
+                tema: "Competencia",
+                fotos: `<img src="Competencia-mr-beast.avif" class="imagen_mini" onclick="mostrarImagen('Competencia-mr-beast.avif')" alt="Imagen de la competencia mrbeast"'>`
+            },
+            actividad3: {
+                region: "Santiago",
+                comuna: "Santiago",
+                sector: "Beauchef 851, La Kinder",
+                nombre: "Carlos M.",
+                email: "carlosm@example.com",
+                telefono: "+56 9 1234 5678",
+                contacto: "whatsapp",
+                inicio: "2026-06-23 12:00",
+                termino: "2026-06-29 03:00",
+                descripcion: "Maratón Intro Algebra",
+                tema: "Educación",
+                fotos: `<img src="Estudiando-intro-al-algebra.jpg" class="imagen_mini" onclick="mostrarImagen('Estudiando-intro-al-algebra.jpg')" alt="Imagen de un chico estudiando"'>`
+            },
+            actividad4: {
+                region: "Providencia",
+                comuna: "Providencia",
+                sector: "Costanera",
+                nombre: "Andrea P.",
+                email: "andrea@example.com",
+                telefono: "+56 9 9876 5432",
+                contacto: "email",
+                inicio: "2027-01-24 13:00",
+                termino: "2027-01-24 17:00",
+                descripcion: "Competencia de comer tortas",
+                tema: "Competencia",
+                fotos: `<img src="Torta-Bruce.jpg" class="imagen_mini" onclick="mostrarImagen('Torta-Bruce.jpg')" alt="Imagen del Bruce de la pelicula de Matilde"'>`
+            },
+            actividad5: {
+                region: "Santiago",
+                comuna: "Santiago",
+                sector: "Beauchef 850, SalaCec",
+                nombre: "Joaquín L.",
+                email: "joaquin@example.com",
+                telefono: "+56 9 2345 6789",
+                contacto: "whatsapp",
+                inicio: "2025-03-28 10:50",
+                termino: "2025-06-28 23:00",
+                descripcion: "\"Aprender\" a hacer página web",
+                tema: "Tecnología",
+                fotos: `<img src="Me-eche-paginas-web.jpg" class="imagen_mini" onclick="mostrarImagen('Me-eche-paginas-web.jpg')" alt="Meme acerca de la crear pag web"'>`
+            },
+        };
+
+        // Mostrar los detalles
+        var actividadDetalle = detalles[actividad];
+        document.getElementById('detalle-region').innerText = actividadDetalle.region;
+        document.getElementById('detalle-comuna').innerText = actividadDetalle.comuna;
+        document.getElementById('detalle-sector').innerText = actividadDetalle.sector;
+        document.getElementById('detalle-nombre').innerText = actividadDetalle.nombre;
+        document.getElementById('detalle-email').innerText = actividadDetalle.email;
+        document.getElementById('detalle-telefono').innerText = actividadDetalle.telefono;
+        document.getElementById('detalle-contacto').innerText = actividadDetalle.contacto;
+        document.getElementById('detalle-inicio').innerText = actividadDetalle.inicio;
+        document.getElementById('detalle-termino').innerText = actividadDetalle.termino;
+        document.getElementById('detalle-descripcion').innerText = actividadDetalle.descripcion;
+        document.getElementById('detalle-tema').innerText = actividadDetalle.tema;
+        document.getElementById('detalle-fotos').innerHTML = actividadDetalle.fotos;
+
+        // Mostrar el detalle de la actividad
+        document.getElementById('detalle-actividad').style.display = 'block';
+    }
+    
+    function mostrarTema() {
+        let temaSelect = document.getElementById("topic");
+        let otroTemaDiv = document.getElementById("otro-topic");
+
+        // Si se selecciona "Otro", muestra el campo para especificar cuál tema
+        if (temaSelect.value === "otro") {
+            otroTemaDiv.style.display = "block";  
+        } else {
+            otroTemaDiv.style.display = "none";   
+        }
+    }
+    function volverListado() {
+        document.getElementById('activities').scrollIntoView({behavior :'smooth'})
+        }
+ 
+</script>
+</body>
+</html>
